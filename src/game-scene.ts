@@ -1,8 +1,9 @@
-import { HealthBar } from "./health-bar";
+import { Bar } from "./bar";
 import { Physics, Scene } from "phaser";
 import Player from "./player";
 import ChasedObject from "./chased-object";
 import DataHandler from "./data-handler";
+import Status from "./status";
 
 const sceneConfig: Phaser.Types.Scenes.SettingsConfig = {
   active: false,
@@ -15,6 +16,7 @@ export class GameScene extends Phaser.Scene {
   heart: ChasedObject;
   velocity = 500;
   dataHandler: DataHandler;
+  ws: WebSocket;
 
   destinationToMouse = { x: 0, y: 0 };
   destinationToHeart = { x: 0, y: 0 };
@@ -34,11 +36,33 @@ export class GameScene extends Phaser.Scene {
     this.load.atlas("rat", "assets/deadRat/rat.png", "assets/deadRat/rat.json");
   }
 
-  public create() {
+  public create(ws: WebSocket) {
     this.player = new Player(this, 50, 50, "player");
     this.heart = new ChasedObject(this, this.player, "heart");
     // this.player.healthBar = new HealthBar(this, 100, 20);
-    
+    this.ws = ws;
+    let statuses: Status[];
+    this.ws.onmessage = (event) => {
+      const stats: string = event.data;
+      statuses = stats
+        .split("\t")
+        .filter((stat) => stat != "")
+        .map((stat) => {
+          const [name, value] = stat.split(" ");
+          return new Status(name, Number(value));
+        });
+      console.log(statuses);
+      let barY = 0;
+      let bars = statuses.map((status) => {
+        const bar = new Bar({ scene: this, x: 0, y: barY, status });
+        barY += 50;
+        return bar;
+      });
+      bars.forEach((bar) => {
+        bar.draw();
+      });
+    };
+
     // this.dataHandler = new DataHandler(this.player);
 
     function onClick(pointer: Phaser.Input.Pointer, scene: GameScene) {
@@ -96,7 +120,7 @@ export class GameScene extends Phaser.Scene {
   }
 
   playerCollideHeart() {
-    this.player.healthBar.increase(10);
+    // this.player.healthBar.increase(10);
     this.heart.move();
   }
 
@@ -108,13 +132,6 @@ export class GameScene extends Phaser.Scene {
       this.destinationToMouse.y
     );
     // console.log('distance:', dist);
-    const distHeart = Phaser.Math.Distance.Between(
-      this.player.sprite.x,
-      this.player.sprite.y,
-      this.heart.sprite.x,
-      this.heart.sprite.y
-    );
-    // console.log(distHeart);
 
     if (distMouse <= 10) {
       // console.log(this.destination.x - this.player.body.x, this.destination.y - this.player.body.y);

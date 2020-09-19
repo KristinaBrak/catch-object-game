@@ -1,13 +1,17 @@
-import { HealthBar } from "./health-bar";
+import { Bar } from "./bar";
 import { Physics } from "phaser";
 
 export default class Player {
-  healthBar: HealthBar;
+  healthBar: Bar;
+  moodBar: Bar;
+  sleepBar:Bar;
+  energyBar:Bar;
+  
   sprite: Physics.Arcade.Sprite;
   scene: Phaser.Scene;
   constructor(scene: Phaser.Scene, x: number, y: number, key: string) {
     this.scene = scene;
-    this.healthBar = new HealthBar(scene, 100, 20);
+    // this.healthBar = new Bar(scene, 100, 20);
     this.sprite = scene.physics.add.sprite(x, y, "player");
     this.sprite.setScale(4, 4);
   }
@@ -38,6 +42,6 @@ export default class Player {
     return myArray;
   }
   changeBarValue(value: number){
-      this.healthBar.current_value = value;
+      this.healthBar.status.current_value = value;
   }
 }

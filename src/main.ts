@@ -27,16 +27,15 @@ const config: Phaser.Types.Core.GameConfig = {
   scene: GameScene,
 };
 
-const ws = new WebSocket("ws://localhost:32100");
 const dataHandler = new DataHandler();
-
+const ws = new WebSocket("ws://localhost:32100");
 ws.onopen = function () {
   ws.send("getStats");
+  const game = new Phaser.Game(config);
+  game.scene.start("Game", ws);
 };
 
-ws.onmessage = function (event) {
-  console.log(event.data);
-  dataHandler.getMessage(event.data);
-};
-
-// const game = new Phaser.Game(config);
+// ws.onmessage = function (event) {
+//   console.log(event.data);
+//   dataHandler.getMessage(event.data);
+// };
