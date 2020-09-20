@@ -2,7 +2,7 @@ import { Bar } from "./bar";
 import { Physics, Scene } from "phaser";
 import Player from "./player";
 import ChasedObject from "./chased-object";
-import DataHandler from "./data-handler";
+import DataHandler from "./data-handler/data-handler";
 import Status from "./status";
 
 const sceneConfig: Phaser.Types.Scenes.SettingsConfig = {
@@ -42,25 +42,28 @@ export class GameScene extends Phaser.Scene {
     // this.player.healthBar = new HealthBar(this, 100, 20);
     this.ws = ws;
     let statuses: Status[];
+    const dataHandler = new DataHandler(this.player);
     this.ws.onmessage = (event) => {
-      const stats: string = event.data;
-      statuses = stats
-        .split("\t")
-        .filter((stat) => stat != "")
-        .map((stat) => {
-          const [name, value] = stat.split(" ");
-          return new Status(name, Number(value));
-        });
-      console.log(statuses);
-      let barY = 0;
-      let bars = statuses.map((status) => {
-        const bar = new Bar({ scene: this, x: 0, y: barY, status });
-        barY += 50;
-        return bar;
-      });
-      bars.forEach((bar) => {
-        bar.draw();
-      });
+      dataHandler.getMessage(event.data);
+      // const stats: string = event.data;
+
+      // statuses = stats
+      //   .split("\t")
+      //   .filter((stat) => stat != "")
+      //   .map((stat) => {
+      //     const [name, value] = stat.split(" ");
+      //     return new Status(name, Number(value));
+      //   });
+      // console.log(statuses);
+      // let barY = 0;
+      // let bars = statuses.map((status) => {
+      //   const bar = new Bar({ scene: this, x: 0, y: barY, status });
+      //   barY += 50;
+      //   return bar;
+      // });
+      // bars.forEach((bar) => {
+      //   bar.draw();
+      // });
     };
 
     // this.dataHandler = new DataHandler(this.player);

@@ -9,10 +9,10 @@ interface BarInterface {
 
 export class Bar {
   bar_display: Phaser.GameObjects.Graphics;
-  status: Status;
+  private _status: Status;
   bar_size = {
-    width: 400,
-    height: 50,
+    width: 200,
+    height: 25,
   };
   bar_frame_size = this.bar_size.width * 0.02;
 
@@ -20,7 +20,7 @@ export class Bar {
     this.bar_display = new Phaser.GameObjects.Graphics(scene);
     this.bar_display.x = x;
     this.bar_display.y = y;
-    this.status = status;
+    this._status = status;
 
     this.draw();
 
@@ -51,21 +51,22 @@ export class Bar {
     );
   }
   changeStatusColor() {
-    if (this.status.current_value <= 30) {
+    if (this._status.current_value <= 30) {
       this.bar_display.fillStyle(0xff0000);
-    } else if (this.status.current_value <= 60) {
+    } else if (this._status.current_value <= 60) {
       this.bar_display.fillStyle(0xff9933);
-    } else if (this.status.current_value <= 90) {
+    } else if (this._status.current_value <= 90) {
       this.bar_display.fillStyle(0xfff000);
     } else {
       this.bar_display.fillStyle(0x00ff00);
     }
   }
   displayStatusChange() {
-    if (this.status.current_value !== 0) {
+    if (this._status.current_value !== 0) {
       this.changeStatusColor();
       let distance = Math.floor(
-        (this.status.current_value / this.status.max_value) * this.bar_size.width -
+        (this._status.current_value / this._status.max_value) *
+          this.bar_size.width -
           this.bar_frame_size * 2
       );
       this.bar_display.fillRect(
@@ -75,5 +76,10 @@ export class Bar {
         this.bar_size.height - this.bar_frame_size * 2
       );
     }
+  }
+
+  public set status(status: Status) {
+    this._status = status;
+    this.draw();
   }
 }

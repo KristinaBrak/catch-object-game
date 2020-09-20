@@ -1,14 +1,12 @@
 import { Bar } from "./bar";
 import { Physics } from "phaser";
+import Status from "./status";
 
 export default class Player {
-  healthBar: Bar;
-  moodBar: Bar;
-  sleepBar:Bar;
-  energyBar:Bar;
-  
+  private _statuses: Bar[];
   sprite: Physics.Arcade.Sprite;
   scene: Phaser.Scene;
+
   constructor(scene: Phaser.Scene, x: number, y: number, key: string) {
     this.scene = scene;
     // this.healthBar = new Bar(scene, 100, 20);
@@ -41,7 +39,19 @@ export default class Player {
     }
     return myArray;
   }
-  changeBarValue(value: number){
-      this.healthBar.status.current_value = value;
+
+  public set statuses(statuses: Status[]) {
+    if (!this._statuses) {
+      let y = 10;
+      this._statuses = statuses.map((status) => {
+        const bar = new Bar({ scene: this.scene, x: 10, y, status });
+        y += 15;
+        return bar;
+      });
+    } else {
+      statuses.forEach((status, index) => {
+        this._statuses[index].status = status;
+      });
+    }
   }
 }
