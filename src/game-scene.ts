@@ -3,7 +3,7 @@ import { Physics, Scene } from "phaser";
 import Player from "./player";
 import ChasedObject from "./chased-object";
 import DataHandler from "./data-handler/data-handler";
-import Status from "./status";
+import Bed from "./bed";
 
 const sceneConfig: Phaser.Types.Scenes.SettingsConfig = {
   active: false,
@@ -14,6 +14,7 @@ const sceneConfig: Phaser.Types.Scenes.SettingsConfig = {
 export class GameScene extends Phaser.Scene {
   player: Player;
   heart: ChasedObject;
+  bed: Bed;
   velocity = 500;
   dataHandler: DataHandler;
   ws: WebSocket;
@@ -26,19 +27,20 @@ export class GameScene extends Phaser.Scene {
   }
 
   public preload() {
-    // this.load.image('player', 'assets/player/idle/player.png');
     this.load.image("heart", "assets/heart/heart_full.png");
     this.load.atlas(
       "player",
       "assets/player/player.png",
       "assets/player/player.json"
     );
-    this.load.atlas("rat", "assets/deadRat/rat.png", "assets/deadRat/rat.json");
+    this.load.image("bed", "assets/carpet.png");
   }
 
   public create(ws: WebSocket) {
-    this.player = new Player(this, 500, 500, "player");
+    this.player = new Player(this, 400, 400, "player");
     this.heart = new ChasedObject(this, this.player, "heart");
+    this.bed = new Bed(this, "bed");
+
     this.ws = ws;
 
     const dataHandler = new DataHandler(this.player);
@@ -76,7 +78,15 @@ export class GameScene extends Phaser.Scene {
     this.physics.add.overlap(
       this.player.sprite,
       this.heart.sprite,
-      this.playerCollideHeart,
+      () => this.heart.move(),
+      null,
+      this
+    );
+
+    this.physics.add.overlap(
+      this.player.sprite,
+      this.bed.sprite,
+      () => this.bed.sleep(),
       null,
       this
     );
@@ -102,11 +112,6 @@ export class GameScene extends Phaser.Scene {
     return myArray;
   }
 
-  playerCollideHeart() {
-    // this.player.healthBar.increase(10);
-    this.heart.move();
-  }
-
   public update() {
     const distMouse = Phaser.Math.Distance.Between(
       this.player.sprite.x,
@@ -114,15 +119,25 @@ export class GameScene extends Phaser.Scene {
       this.destinationToMouse.x,
       this.destinationToMouse.y
     );
-    // console.log('distance:', dist);
 
     if (distMouse <= 10) {
-      // console.log(this.destination.x - this.player.body.x, this.destination.y - this.player.body.y);
-      // console.log({ player: { x: this.player.body.x, y: this.player.body.y } });
       this.player.sprite.body.velocity.setTo(0, 0);
       this.player.sprite.play("idle");
       this.destinationToMouse.x = 0;
       this.destinationToMouse.y = 0;
     }
+
+    // const distBed = Phaser.Math.Distance.Between(
+    //   this.player.sprite.x,
+    //   this.player.sprite.y,
+    //   this.bed.sprite.x,
+    //   this.bed.sprite.y
+    // );
+    // if (distBed <= this.bed.sprite.height) {
+    //   this.player.sprite.body.velocity.setTo(0, 0);
+    //   this.player.sprite.play("idle");
+    //   this.bed.used = true;
+    // }
+    // this.bed.used = false;
   }
 }

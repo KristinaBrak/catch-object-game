@@ -22,6 +22,7 @@ export class Bar {
     this.bar_display = new Phaser.GameObjects.Graphics(scene);
     this.bar_display.setX(x);
     this.bar_display.setY(y);
+    this.bar_display.setDepth(0.99);
     this._status = status;
     this.draw();
 

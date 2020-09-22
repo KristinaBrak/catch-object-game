@@ -11,6 +11,7 @@ export default class Player {
     this.scene = scene;
     this.sprite = scene.physics.add.sprite(x, y, "player");
     this.sprite.setScale(4, 4);
+    this.sprite.setDepth(0.5);
   }
 
   createAnimations() {
