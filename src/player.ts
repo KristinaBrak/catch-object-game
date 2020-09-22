@@ -9,7 +9,6 @@ export default class Player {
 
   constructor(scene: Phaser.Scene, x: number, y: number, key: string) {
     this.scene = scene;
-    // this.healthBar = new Bar(scene, 100, 20);
     this.sprite = scene.physics.add.sprite(x, y, "player");
     this.sprite.setScale(4, 4);
   }
@@ -28,6 +27,7 @@ export default class Player {
       repeat: -1,
     });
   }
+
   makeAnimation(key: string, frameName: string, numberOfFrames: number) {
     const myArray = [];
     for (let i = 1; i <= numberOfFrames; i++) {
@@ -45,7 +45,7 @@ export default class Player {
       let y = 10;
       this._statuses = statuses.map((status) => {
         const bar = new Bar({ scene: this.scene, x: 10, y, status });
-        y += 15;
+        y += 20;
         return bar;
       });
     } else {

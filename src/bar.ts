@@ -8,6 +8,7 @@ interface BarInterface {
 }
 
 export class Bar {
+  scene: Phaser.Scene;
   bar_display: Phaser.GameObjects.Graphics;
   private _status: Status;
   bar_size = {
@@ -17,11 +18,11 @@ export class Bar {
   bar_frame_size = this.bar_size.width * 0.02;
 
   constructor({ scene, x, y, status }: BarInterface) {
+    this.scene = scene;
     this.bar_display = new Phaser.GameObjects.Graphics(scene);
-    this.bar_display.x = x;
-    this.bar_display.y = y;
+    this.bar_display.setX(x);
+    this.bar_display.setY(y);
     this._status = status;
-
     this.draw();
 
     scene.add.existing(this.bar_display);
@@ -31,8 +32,24 @@ export class Bar {
     this.bar_display.clear();
     this.createEmptyStatusBar();
     this.displayStatusChange();
+    this.displayName();
   }
-  createEmptyStatusBar() {
+  private displayName() {
+    const name: string = this._status.name;
+
+    text: Phaser.GameObjects.Text;
+    const { x, y } = this.calculateTextPosition();
+    const text = this.scene.add.text(x, y, name, { color: "000" });
+    text.depth = 1;
+  }
+  private calculateTextPosition() {
+    return {
+      x: this.bar_display.x * 2 + this.bar_frame_size + 5,
+      y: this.bar_display.y * 2 + this.bar_frame_size,
+    };
+  }
+
+  private createEmptyStatusBar() {
     //  Creating black fream and white background
     this.bar_display.fillStyle(0x000000);
     this.bar_display.fillRect(
@@ -50,18 +67,8 @@ export class Bar {
       this.bar_size.height - this.bar_frame_size * 2
     );
   }
-  changeStatusColor() {
-    if (this._status.current_value <= 30) {
-      this.bar_display.fillStyle(0xff0000);
-    } else if (this._status.current_value <= 60) {
-      this.bar_display.fillStyle(0xff9933);
-    } else if (this._status.current_value <= 90) {
-      this.bar_display.fillStyle(0xfff000);
-    } else {
-      this.bar_display.fillStyle(0x00ff00);
-    }
-  }
-  displayStatusChange() {
+
+  private displayStatusChange() {
     if (this._status.current_value !== 0) {
       this.changeStatusColor();
       let distance = Math.floor(
@@ -75,6 +82,18 @@ export class Bar {
         distance,
         this.bar_size.height - this.bar_frame_size * 2
       );
+    }
+  }
+
+  private changeStatusColor() {
+    if (this._status.current_value <= 30) {
+      this.bar_display.fillStyle(0xff0000);
+    } else if (this._status.current_value <= 60) {
+      this.bar_display.fillStyle(0xff9933);
+    } else if (this._status.current_value <= 90) {
+      this.bar_display.fillStyle(0xfff000);
+    } else {
+      this.bar_display.fillStyle(0x00ff00);
     }
   }
 

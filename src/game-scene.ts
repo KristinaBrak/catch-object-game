@@ -10,9 +10,9 @@ const sceneConfig: Phaser.Types.Scenes.SettingsConfig = {
   visible: false,
   key: "Game",
 };
+
 export class GameScene extends Phaser.Scene {
   player: Player;
-  // heart: Phaser.Physics.Arcade.Sprite;
   heart: ChasedObject;
   velocity = 500;
   dataHandler: DataHandler;
@@ -37,42 +37,22 @@ export class GameScene extends Phaser.Scene {
   }
 
   public create(ws: WebSocket) {
-    this.player = new Player(this, 50, 50, "player");
+    this.player = new Player(this, 500, 500, "player");
     this.heart = new ChasedObject(this, this.player, "heart");
-    // this.player.healthBar = new HealthBar(this, 100, 20);
     this.ws = ws;
-    let statuses: Status[];
+
     const dataHandler = new DataHandler(this.player);
+
     this.ws.onmessage = (event) => {
       dataHandler.getMessage(event.data);
-      // const stats: string = event.data;
-
-      // statuses = stats
-      //   .split("\t")
-      //   .filter((stat) => stat != "")
-      //   .map((stat) => {
-      //     const [name, value] = stat.split(" ");
-      //     return new Status(name, Number(value));
-      //   });
-      // console.log(statuses);
-      // let barY = 0;
-      // let bars = statuses.map((status) => {
-      //   const bar = new Bar({ scene: this, x: 0, y: barY, status });
-      //   barY += 50;
-      //   return bar;
-      // });
-      // bars.forEach((bar) => {
-      //   bar.draw();
-      // });
     };
 
-    // this.dataHandler = new DataHandler(this.player);
+    this.dataHandler = new DataHandler(this.player);
 
     function onClick(pointer: Phaser.Input.Pointer, scene: GameScene) {
       scene.destinationToMouse.x = pointer.x;
       scene.destinationToMouse.y = pointer.y;
 
-      // scene.changeMoveAnimation(this.player, scene.destinationToMouse.x);
       if (scene.destinationToMouse.x - scene.player.sprite.body.x < 0) {
         scene.player.sprite.play("move").setFlipX(false);
       } else {

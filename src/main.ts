@@ -10,7 +10,7 @@ const config: Phaser.Types.Core.GameConfig = {
   physics: {
     default: "arcade",
     arcade: {
-      debug: false,
+      debug: true,
     },
   },
   render: {
@@ -27,3 +27,4 @@ ws.onopen = function () {
   const game = new Phaser.Game(config);
   game.scene.start("Game", ws);
 };
+// game.scene.start("Game");
